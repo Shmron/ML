@@ -1,48 +1,31 @@
 import streamlit as st
-import pandas as pd
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.feature_extraction.text import CountVectorizer
 
 # Sample data
 courses = {
-    'Course': [
-        'Backend Development', 'Machine Learning', 'Database', 'Data Analysis', 
-        'Data Science', 'Cloud Computing', 'Big Data', 'Python', 
-        'Frontend Development', 'Containers', 'Computer Vision', 'Chatbot', 'Blockchain'
-    ],
-    'Genre': [
-        'Development', 'AI', 'Database', 'Data Analysis', 
-        'Data Science', 'Cloud', 'Big Data', 'Programming', 
-        'Development', 'DevOps', 'AI', 'AI', 'Blockchain'
-    ]
+    'Backend Development': ['Python', 'Database', 'Cloud Computing'],
+    'Machine Learning': ['Data Science', 'Computer Vision', 'Chatbot'],
+    'Database': ['Backend Development', 'Big Data', 'Data Analysis'],
+    'Data Analysis': ['Data Science', 'Machine Learning', 'Python'],
+    'Data Science': ['Machine Learning', 'Big Data', 'Data Analysis'],
+    'Cloud Computing': ['Containers', 'Backend Development', 'Big Data'],
+    'Big Data': ['Data Science', 'Database', 'Cloud Computing'],
+    'Python': ['Backend Development', 'Data Analysis', 'Machine Learning'],
+    'Frontend Development': ['Backend Development', 'Containers', 'Chatbot'],
+    'Containers': ['Cloud Computing', 'Backend Development', 'DevOps'],
+    'Computer Vision': ['Machine Learning', 'Data Science', 'Chatbot'],
+    'Chatbot': ['Machine Learning', 'Computer Vision', 'AI'],
+    'Blockchain': ['Cryptocurrency', 'Smart Contracts', 'Decentralized Apps']
 }
-
-# Convert to DataFrame
-df = pd.DataFrame(courses)
-
-# Function to recommend courses
-def recommend_courses(course_name, num_recommendations=5):
-    count_vectorizer = CountVectorizer()
-    count_matrix = count_vectorizer.fit_transform(df['Genre'])
-    cosine_sim = cosine_similarity(count_matrix, count_matrix)
-    
-    course_index = df[df['Course'] == course_name].index[0]
-    similarity_scores = list(enumerate(cosine_sim[course_index]))
-    similarity_scores = sorted(similarity_scores, key=lambda x: x[1], reverse=True)
-    similarity_scores = similarity_scores[1:num_recommendations+1]
-    
-    course_indices = [i[0] for i in similarity_scores]
-    return df['Course'].iloc[course_indices]
 
 # Streamlit app
 st.title('Course Recommender System')
 
 # User input
-selected_course = st.selectbox('Select a course you like:', df['Course'])
+selected_course = st.selectbox('Select a course you like:', list(courses.keys()))
 
 # Recommend courses
 if st.button('Recommend'):
-    recommendations = recommend_courses(selected_course)
+    recommendations = courses.get(selected_course, [])
     st.write('Courses you might like:')
     for course in recommendations:
         st.write(course)
